@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Personal Hub - Life & Productivity Dashboard</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- FontAwesome Icons CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(156, 163, 175, 0.4);
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(156, 163, 175, 0.6);
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+        }
+        .dark .glass-card {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+        }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800 dark:bg-slate-900 dark:text-slate-100 min-h-screen font-sans transition-colors duration-200">
+
+    <!-- Navigation / Header -->
+    <header class="sticky top-0 z-50 glass-card border-b border-slate-200 dark:border-slate-800 px-4 lg:px-8 py-3 mb-6 transition-colors duration-200">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+            <!-- Brand & Status -->
+            <div class="flex items-center space-x-3 w-full md:w-auto justify-between md:justify-start">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-400 flex items-center justify-center text-white text-xl font-bold shadow-md shadow-emerald-500/20">
+                        ⚡
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-bold tracking-tight">My Personal Hub</h1>
+                        <div class="flex items-center space-x-2">
+                            <span class="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                            <span id="userStatusText" class="text-xs text-slate-500 dark:text-slate-400 font-medium">Focus Mode Active</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Theme Toggle Button (Mobile right aligned) -->
+                <button id="themeToggleMobile" class="md:hidden p-2 rounded-lg bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-700 transition">
+                    <i class="fa-solid fa-moon dark:hidden"></i>
+                    <i class="fa-solid fa-sun hidden dark:inline"></i>
+                </button>
+            </div>
+
+            <!-- Clock & Controls -->
+            <div class="flex items-center space-x-6 w-full md:w-auto justify-between md:justify-end">
+                <!-- Clock -->
+                <div class="text-left md:text-right">
+                    <div id="liveClock" class="text-2xl font-extrabold tracking-tight font-mono text-slate-800 dark:text-slate-100">00:00:00</div>
+                    <div id="liveDate" class="text-xs text-slate-500 dark:text-slate-400 font-medium">Loading Date...</div>
+                </div>
+
+                <div class="h-8 w-px bg-slate-300 dark:bg-slate-700 hidden md:block"></div>
+
+                <!-- Theme & Customization -->
+                <div class="flex items-center space-x-2">
+                    <button id="statusBtn" title="Toggle Status" class="px-3 py-1.5 text-xs font-semibold rounded-lg border border-slate-300 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-800 transition">
+                        <i class="fa-solid fa-circle-dot text-emerald-500 mr-1"></i> Status
+                    </button>
+                    <button id="themeToggleDesktop" class="hidden md:flex p-2 rounded-lg bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-700 transition">
+                        <i class="fa-solid fa-moon dark:hidden"></i>
+                        <i class="fa-solid fa-sun hidden dark:inline"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="max-w-7xl mx-auto px-4 lg:px-8 pb-12 space-y-6">
+
+        <!-- KPI Summary Metric Cards -->
+        <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <!-- Daily Tasks Metric -->
+            <div class="glass-card rounded-2xl p-5 border border-slate-200/80 dark:border-slate-800/80 shadow-sm hover:shadow-md transition">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Daily Tasks</span>
+                    <div class="p-2 rounded-lg bg-blue-500/10 text-blue-500">
+                        <i class="fa-solid fa-list-check"></i>
+                    </div>
+                </div>
+                <div class="mt-3 flex items-baseline justify-between">
+                    <span id="kpiTaskRatio" class="text-2xl font-bold">0 / 0</span>
+                    <span id="kpiTaskPercent" class="text-xs font-semibold px-2 py-0.5 rounded bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300">0%</span>
+                </div>
+                <div class="w-full bg-slate-200 dark:bg-slate-700 h-1.5 rounded-full mt-3 overflow-hidden">
+                    <div id="kpiTaskProgress" class="bg-blue-500 h-1.5 rounded-full transition-all duration-300" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <!-- Budget Spent Metric -->
+            <div class="glass-card rounded-2xl p-5 border border-slate-200/80 dark:border-slate-800/80 shadow-sm hover:shadow-md transition">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Monthly Expenses</span>
+                    <div class="p-2 rounded-lg bg-emerald-500/10 text-emerald-500">
+                        <i class="fa-solid fa-wallet"></i>
+                    </div>
+                </div>
+                <div class="mt-3 flex items-baseline justify-between">
+                    <span id="kpiExpenses" class="text-2xl font-bold">$0.00</span>
+                    <span id="kpiBudgetGoal" class="text-xs text-slate-500 dark:text-slate-400">Goal: $1,500</span>
+                </div>
+                <div class="w-full bg-slate-200 dark:bg-slate-700 h-1.5 rounded-full mt-3 overflow-hidden">
+                    <div id="kpiBudgetProgress" class="bg-emerald-500 h-1.5 rounded-full transition-all duration-300" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <!-- Habit Streak Metric -->
+            <div class="glass-card rounded-2xl p-5 border border-slate-200/80 dark:border-slate-800/80 shadow-sm hover:shadow-md transition">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Habit Completion</span>
+                    <div class="p-2 rounded-lg bg-amber-500/10 text-amber-500">
+                        <i class="fa-solid fa-fire"></i>
+                    </div>
+                </div>
+                <div class="mt-3 flex items-baseline justify-between">
+                    <span id="kpiHabitCompletion" class="text-2xl font-bold">0%</span>
+                    <span class="text-xs font-semibold text-amber-500">Weekly Target</span>
+                </div>
+                <div class="w-full bg-slate-200 dark:bg-slate-700 h-1.5 rounded-full mt-3 overflow-hidden">
+                    <div id="kpiHabitProgress" class="bg-amber-500 h-1.5 rounded-full transition-all duration-300" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <!-- Water Intake Metric -->
+            <div class="glass-card rounded-2xl p-5 border border-slate-200/80 dark:border-slate-800/80 shadow-sm hover:shadow-md transition">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Water Intake</span>
+                    <div class="p-2 rounded-lg bg-cyan-500/10 text-cyan-500">
+                        <i class="fa-solid fa-glass-water"></i>
+                    </div>
+                </div>
+                <div class="mt-3 flex items-center justify-between">
+                    <div>
+                        <span id="waterGlasses" class="text-2xl font-bold">0</span>
+                        <span class="text-sm text-slate-500 dark:text-slate-400">/ 8 glasses</span>
+                    </div>
+                    <div class="flex items-center space-x-1">
+                        <button id="addWaterBtn" class="px-2.5 py-1 bg-cyan-500 hover:bg-cyan-600 text-white font-bold rounded-lg shadow transition text-sm">
+                            +1 <i class="fa-solid fa-plus text-xs"></i>
+                        </button>
+                        <button id="resetWaterBtn" class="px-2 py-1 bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-600 rounded-lg transition text-xs" title="Reset Water">
+                            <i class="fa-solid fa-rotate-right"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="w-full bg-slate-200 dark:bg-slate-700 h-1.5 rounded-full mt-3 overflow-hidden">
+                    <div id="kpiWaterProgress" class="bg-cyan-500 h-1.5 rounded-full transition-all duration-300" style="width: 0%"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Main Dashboard Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+            <!-- Left & Middle Section: Tasks & Habits (2 cols wide on desktop) -->
+            <div class="lg:col-span-2 space-y-6">
+
+                <!-- Task Manager Widget -->
+                <div class="glass-card rounded-2xl p-6 border border-slate-200/80 dark:border-slate-800/80 shadow-sm">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
+                        <div class="flex items-center space-x-2">
+                            <i class="fa-solid fa-square-check text-xl text-blue-500"></i>
+                            <h2 class="text-lg font-bold">Task Manager</h2>
+                        </div>
+                        
+                        <!-- Filter Tabs -->
+                        <div class="flex items-center bg-slate-200/70 dark:bg-slate-800 p-1 rounded-xl text-xs font-medium self-start sm:self-auto">
+                            <button id="filterAll" class="px-3 py-1 rounded-lg bg-white dark:bg-slate-700 shadow-sm text-slate-800 dark:text-white transition">All</button>
+                            <button id="filterActive" class="px-3 py-1 rounded-lg text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition">Active</button>
+                            <button id="filterCompleted" class="px-3 py-1 rounded-lg text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition">Completed</button>
+                        </div>
+                    </div>
+
+                    <!-- Input Form -->
+                    <form id="taskForm" class="grid grid-cols-1 sm:grid-cols-12 gap-2 mb-5">
+                        <input type="text" id="taskInput" placeholder="Add a new task..." required
+                            class="sm:col-span-6 px-4 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+                        
+                        <select id="taskPriority" class="sm:col-span-3 px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+                            <option value="Low">Low Priority</option>
+                            <option value="Medium" selected>Med Priority</option>
+                            <option value="High">High Priority</option>
+                        </select>
+
+                        <button type="submit" class="sm:col-span-3 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-xl shadow-md shadow-blue-500/20 transition flex items-center justify-center space-x-2">
+                            <i class="fa-solid fa-plus"></i>
+                            <span>Add Task</span>
+                        </button>
+                    </form>
+
+                    <!-- Task List -->
+                    <ul id="taskList" class="space-y-2.5 max-h-[340px] overflow-y-auto pr-1">
+                        <!-- Tasks dynamically injected here -->
+                    </ul>
+                </div>
+
+                <!-- Habit Tracker Matrix Widget -->
+                <div class="glass-card rounded-2xl p-6 border border-slate-200/80 dark:border-slate-800/80 shadow-sm">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center space-x-2">
+                            <i class="fa-solid fa-calendar-check text-xl text-amber-500"></i>
+                            <h2 class="text-lg font-bold">Habit Tracker</h2>
+                        </div>
+                        <span class="text-xs text-slate-500 dark:text-slate-400">Click cells to mark complete</span>
+                    </div>
+
+                    <!-- Habit Matrix Table -->
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm text-left">
+                            <thead>
+                                <tr class="text-xs text-slate-400 uppercase border-b border-slate-200 dark:border-slate-800">
+                                    <th class="py-2 px-3">Habit</th>
+                                    <th class="py-2 text-center w-10">M</th>
+                                    <th class="py-2 text-center w-10">T</th>
+                                    <th class="py-2 text-center w-10">W</th>
+                                    <th class="py-2 text-center w-10">T</th>
+                                    <th class="py-2 text-center w-10">F</th>
+                                    <th class="py-2 text-center w-10">S</th>
+                                    <th class="py-2 text-center w-10">S</th>
+                                </tr>
+                            </thead>
+                            <tbody id="habitTableBody" class="divide-y divide-slate-100 dark:divide-slate-800/60">
+                                <!-- Habit Rows Injected via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Right Column: Personal Finance & Notes Scratchpad -->
+            <div class="space-y-6">
+
+                <!-- Finance / Expense Tracker -->
+                <div class="glass-card rounded-2xl p-6 border border-slate-200/80 dark:border-slate-800/80 shadow-sm">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center space-x-2">
+                            <i class="fa-solid fa-chart-pie text-xl text-emerald-500"></i>
+                            <h2 class="text-lg font-bold">Expenses Breakdown</h2>
+                        </div>
+                    </div>
+
+                    <!-- Chart Canvas -->
+                    <div class="relative h-44 w-full mb-4">
+                        <canvas id="expenseChart"></canvas>
+                    </div>
+
+                    <!-- Add Expense Mini Form -->
+                    <form id="expenseForm" class="flex flex-col space-y-2 pt-2 border-t border-slate-200 dark:border-slate-800">
+                        <div class="grid grid-cols-2 gap-2">
+                            <input type="text" id="expenseName" placeholder="Item Name" required class="px-3 py-1.5 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs">
+                            <input type="number" id="expenseAmount" placeholder="Amount ($)" step="0.01" required class="px-3 py-1.5 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs">
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <select id="expenseCategory" class="px-3 py-1.5 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs">
+                                <option value="Food">Food</option>
+                                <option value="Bills">Bills</option>
+                                <option value="Shopping">Shopping</option>
+                                <option value="Entertainment">Entertainment</option>
+                                <option value="Other">Other</option>
+                            </select>
+                            <button type="submit" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold shadow transition">
+                                Log Expense
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Quick Notes Scratchpad -->
+                <div class="glass-card rounded-2xl p-6 border border-slate-200/80 dark:border-slate-800/80 shadow-sm">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="flex items-center space-x-2">
+                            <i class="fa-solid fa-pen-to-square text-xl text-purple-500"></i>
+                            <h2 class="text-lg font-bold">Quick Notes</h2>
+                        </div>
+                        <span id="saveNotice" class="text-xs text-purple-500 font-medium opacity-0 transition-opacity duration-300">Saved</span>
+                    </div>
+                    <textarea id="scratchpad" rows="5" placeholder="Type quick thoughts or ideas here... (Auto-saves automatically)"
+                        class="w-full p-3 text-sm rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"></textarea>
+                </div>
+
+                <!-- Quick Web Shortcuts Grid -->
+                <div class="glass-card rounded-2xl p-6 border border-slate-200/80 dark:border-slate-800/80 shadow-sm">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="flex items-center space-x-2">
+                            <i class="fa-solid fa-bookmark text-xl text-pink-500"></i>
+                            <h2 class="text-lg font-bold">Quick Bookmarks</h2>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-3 gap-3">
+                        <a href="https://github.com" target="_blank" class="flex flex-col items-center justify-center p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60 hover:bg-slate-100 dark:hover:bg-slate-800 transition group">
+                            <i class="fa-brands fa-github text-xl text-slate-700 dark:text-slate-200 group-hover:scale-110 transition-transform"></i>
+                            <span class="text-xs mt-1 font-medium text-slate-600 dark:text-slate-400">GitHub</span>
+                        </a>
+                        <a href="https://gmail.com" target="_blank" class="flex flex-col items-center justify-center p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60 hover:bg-slate-100 dark:hover:bg-slate-800 transition group">
+                            <i class="fa-solid fa-envelope text-xl text-red-500 group-hover:scale-110 transition-transform"></i>
+                            <span class="text-xs mt-1 font-medium text-slate-600 dark:text-slate-400">Gmail</span>
+                        </a>
+                        <a href="https://youtube.com" target="_blank" class="flex flex-col items-center justify-center p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60 hover:bg-slate-100 dark:hover:bg-slate-800 transition group">
+                            <i class="fa-brands fa-youtube text-xl text-red-600 group-hover:scale-110 transition-transform"></i>
+                            <span class="text-xs mt-1 font-medium text-slate-600 dark:text-slate-400">YouTube</span>
+                        </a>
+                        <a href="https://notion.so" target="_blank" class="flex flex-col items-center justify-center p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60 hover:bg-slate-100 dark:hover:bg-slate-800 transition group">
+                            <i class="fa-solid fa-file-pen text-xl text-slate-800 dark:text-slate-100 group-hover:scale-110 transition-transform"></i>
+                            <span class="text-xs mt-1 font-medium text-slate-600 dark:text-slate-400">Notion</span>
+                        </a>
+                        <a href="https://drive.google.com" target="_blank" class="flex flex-col items-center justify-center p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60 hover:bg-slate-100 dark:hover:bg-slate-800 transition group">
+                            <i class="fa-brands fa-google-drive text-xl text-amber-500 group-hover:scale-110 transition-transform"></i>
+                            <span class="text-xs mt-1 font-medium text-slate-600 dark:text-slate-400">Drive</span>
+                        </a>
+                        <a href="https://chatgpt.com" target="_blank" class="flex flex-col items-center justify-center p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60 hover:bg-slate-100 dark:hover:bg-slate-800 transition group">
+                            <i class="fa-solid fa-robot text-xl text-emerald-500 group-hover:scale-110 transition-transform"></i>
+                            <span class="text-xs mt-1 font-medium text-slate-600 dark:text-slate-400">ChatGPT</span>
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        // --- State Management with LocalStorage Defaults ---
+        const DEFAULT_DATA = {
+            status: 'Focus Mode Active',
+            waterCount: 3,
+            notes: "Welcome to your free personal dashboard!\n- Add tasks above\n- Track habits weekly\n- Log expenses on the right",
+            tasks: [
+                { id: 1, text: "Complete daily workout routine", priority: "High", completed: false },
+                { id: 2, text: "Review weekly budget goals", priority: "Medium", completed: true },
+                { id: 3, text: "Read 20 pages of book", priority: "Low", completed: false }
+            ],
+            habits: [
+                { name: "Morning Exercise", progress: [true, true, false, true, false, false, false] },
+                { name: "Meditation / Reading", progress: [true, false, true, true, false, false, false] },
+                { name: "Coding / Learning", progress: [true, true, true, false, false, false, false] }
+            ],
+            expenses: [
+                { id: 1, name: "Groceries", amount: 42.50, category: "Food" },
+                { id: 2, name: "Internet Bill", amount: 65.00, category: "Bills" },
+                { id: 3, name: "Movie Night", amount: 18.00, category: "Entertainment" }
+            ]
+        };
+
+        let appData = JSON.parse(localStorage.getItem('my_hub_data')) || DEFAULT_DATA;
+        let activeFilter = 'All';
+        let chartInstance = null;
+
+        function saveData() {
+            localStorage.setItem('my_hub_data', JSON.stringify(appData));
+            updateKPIs();
+        }
+
+        // --- 1. Clock & Date Display ---
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('liveClock').textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            document.getElementById('liveDate').textContent = now.toLocaleDateString([], { weekday: 'long', month: 'short', day: 'numeric', year: 'numeric' });
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        // --- 2. Dark / Light Theme Toggle ---
+        function toggleTheme() {
+            document.documentElement.classList.toggle('dark');
+            const isDark = document.documentElement.classList.contains('dark');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            if (chartInstance) renderChart();
+        }
+
+        document.getElementById('themeToggleDesktop').addEventListener('click', toggleTheme);
+        document.getElementById('themeToggleMobile').addEventListener('click', toggleTheme);
+
+        // Set initial theme preference
+        if (localStorage.getItem('theme') === 'light') {
+            document.documentElement.classList.remove('dark');
+        }
+
+        // --- Status Toggle ---
+        const statuses = ['Focus Mode Active', 'In a Meeting', 'Relaxing', 'Deep Work'];
+        document.getElementById('statusBtn').addEventListener('click', () => {
+            let currentIndex = statuses.indexOf(appData.status);
+            appData.status = statuses[(currentIndex + 1) % statuses.length];
+            document.getElementById('userStatusText').textContent = appData.status;
+            saveData();
+        });
+        document.getElementById('userStatusText').textContent = appData.status;
+
+        // --- 3. Task Manager Logic ---
+        const taskForm = document.getElementById('taskForm');
+        const taskInput = document.getElementById('taskInput');
+        const taskPriority = document.getElementById('taskPriority');
+        const taskList = document.getElementById('taskList');
+
+        function renderTasks() {
+            taskList.innerHTML = '';
+            
+            const filteredTasks = appData.tasks.filter(task => {
+                if (activeFilter === 'Active') return !task.completed;
+                if (activeFilter === 'Completed') return task.completed;
+                return true;
+            });
+
+            if (filteredTasks.length === 0) {
+                taskList.innerHTML = `<li class="text-center text-sm text-slate-400 py-6">No tasks found.</li>`;
+                return;
+            }
+
+            filteredTasks.forEach(task => {
+                const li = document.createElement('li');
+                li.className = `flex items-center justify-between p-3 rounded-xl border transition ${
+                    task.completed 
+                    ? 'bg-slate-50/50 dark:bg-slate-800/30 border-slate-200/50 dark:border-slate-800/50 opacity-60' 
+                    : 'bg-slate-50 dark:bg-slate-800/80 border-slate-200 dark:border-slate-700/80'
+                }`;
+
+                const badgeColors = {
+                    High: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
+                    Medium: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400',
+                    Low: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'
+                };
+
+                li.innerHTML = `
+                    <div class="flex items-center space-x-3 overflow-hidden">
+                        <input type="checkbox" ${task.completed ? 'checked' : ''} 
+                            onchange="toggleTask(${task.id})"
+                            class="w-4 h-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500 cursor-pointer">
+                        <span class="text-sm font-medium ${task.completed ? 'line-through text-slate-400 dark:text-slate-500' : ''} truncate">${task.text}</span>
+                    </div>
+                    <div class="flex items-center space-x-2 flex-shrink-0">
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${badgeColors[task.priority]}">${task.priority}</span>
+                        <button onclick="deleteTask(${task.id})" class="text-slate-400 hover:text-red-500 transition px-1">
+                            <i class="fa-solid fa-trash-can text-xs"></i>
+                        </button>
+                    </div>
+                `;
+                taskList.appendChild(li);
+            });
+        }
+
+        taskForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const text = taskInput.value.trim();
+            if (!text) return;
+
+            appData.tasks.unshift({
+                id: Date.now(),
+                text: text,
+                priority: taskPriority.value,
+                completed: false
+            });
+
+            taskInput.value = '';
+            saveData();
+            renderTasks();
+        });
+
+        window.toggleTask = function(id) {
+            const task = appData.tasks.find(t => t.id === id);
+            if (task) {
+                task.completed = !task.completed;
+                saveData();
+                renderTasks();
+            }
+        };
+
+        window.deleteTask = function(id) {
+            appData.tasks = appData.tasks.filter(t => t.id !== id);
+            saveData();
+            renderTasks();
+        };
+
+        // Filter Handlers
+        ['filterAll', 'filterActive', 'filterCompleted'].forEach(id => {
+            document.getElementById(id).addEventListener('click', (e) => {
+                document.querySelectorAll('#filterAll, #filterActive, #filterCompleted').forEach(btn => {
+                    btn.className = "px-3 py-1 rounded-lg text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition";
+                });
+                e.target.className = "px-3 py-1 rounded-lg bg-white dark:bg-slate-700 shadow-sm text-slate-800 dark:text-white transition";
+                activeFilter = id.replace('filter', '');
+                renderTasks();
+            });
+        });
+
+        // --- 4. Habit Tracker Matrix ---
+        function renderHabits() {
+            const tbody = document.getElementById('habitTableBody');
+            tbody.innerHTML = '';
+
+            appData.habits.forEach((habit, hIdx) => {
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition';
+
+                let cellsHTML = `<td class="py-3 px-3 font-medium text-xs sm:text-sm">${habit.name}</td>`;
+                habit.progress.forEach((status, dayIdx) => {
+                    cellsHTML += `
+                        <td class="py-3 text-center">
+                            <button onclick="toggleHabit(${hIdx}, ${dayIdx})" 
+                                class="w-7 h-7 rounded-lg text-xs font-bold transition ${
+                                    status 
+                                    ? 'bg-amber-500 text-white shadow-sm shadow-amber-500/30' 
+                                    : 'bg-slate-100 dark:bg-slate-800 text-slate-300 dark:text-slate-600 hover:bg-slate-200 dark:hover:bg-slate-700'
+                                }">
+                                ${status ? '✓' : ''}
+                            </button>
+                        </td>
+                    `;
+                });
+
+                tr.innerHTML = cellsHTML;
+                tbody.appendChild(tr);
+            });
+        }
+
+        window.toggleHabit = function(habitIndex, dayIndex) {
+            appData.habits[habitIndex].progress[dayIndex] = !appData.habits[habitIndex].progress[dayIndex];
+            saveData();
+            renderHabits();
+        };
+
+        // --- 5. Water Intake Tracker ---
+        document.getElementById('addWaterBtn').addEventListener('click', () => {
+            if (appData.waterCount < 8) {
+                appData.waterCount++;
+                saveData();
+                updateWaterDisplay();
+            }
+        });
+
+        document.getElementById('resetWaterBtn').addEventListener('click', () => {
+            appData.waterCount = 0;
+            saveData();
+            updateWaterDisplay();
+        });
+
+        function updateWaterDisplay() {
+            document.getElementById('waterGlasses').textContent = appData.waterCount;
+            const pct = Math.min((appData.waterCount / 8) * 100, 100);
+            document.getElementById('kpiWaterProgress').style.width = `${pct}%`;
+        }
+
+        // --- 6. Personal Finance / Expense Chart & List ---
+        const expenseForm = document.getElementById('expenseForm');
+        
+        function renderChart() {
+            const ctx = document.getElementById('expenseChart').getContext('2d');
+            
+            // Group expenses by category
+            const categories = ['Food', 'Bills', 'Shopping', 'Entertainment', 'Other'];
+            const totals = categories.map(cat => {
+                return appData.expenses
+                    .filter(e => e.category === cat)
+                    .reduce((sum, e) => sum + parseFloat(e.amount), 0);
+            });
+
+            const isDark = document.documentElement.classList.contains('dark');
+            const textColor = isDark ? '#cbd5e1' : '#475569';
+
+            if (chartInstance) chartInstance.destroy();
+
+            chartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: categories,
+                    datasets: [{
+                        data: totals,
+                        backgroundColor: [
+                            '#10b981', // emerald
+                            '#3b82f6', // blue
+                            '#f59e0b', // amber
+                            '#ec4899', // pink
+                            '#8b5cf6'  // purple
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: {
+                                color: textColor,
+                                font: { size: 10 },
+                                boxWidth: 12
+                            }
+                        }
+                    },
+                    cutout: '70%'
+                }
+            });
+        }
+
+        expenseForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const name = document.getElementById('expenseName').value.trim();
+            const amount = parseFloat(document.getElementById('expenseAmount').value);
+            const category = document.getElementById('expenseCategory').value;
+
+            if (!name || isNaN(amount)) return;
+
+            appData.expenses.push({
+                id: Date.now(),
+                name,
+                amount,
+                category
+            });
+
+            document.getElementById('expenseName').value = '';
+            document.getElementById('expenseAmount').value = '';
+
+            saveData();
+            renderChart();
+        });
+
+        // --- 7. Quick Notes Scratchpad ---
+        const scratchpad = document.getElementById('scratchpad');
+        const saveNotice = document.getElementById('saveNotice');
+        let autoSaveTimer;
+
+        scratchpad.value = appData.notes || '';
+
+        scratchpad.addEventListener('input', () => {
+            clearTimeout(autoSaveTimer);
+            autoSaveTimer = setTimeout(() => {
+                appData.notes = scratchpad.value;
+                saveData();
+                saveNotice.style.opacity = '1';
+                setTimeout(() => { saveNotice.style.opacity = '0'; }, 1500);
+            }, 500);
+        });
+
+        // --- 8. Update KPI Summary Cards ---
+        function updateKPIs() {
+            // Tasks KPI
+            const completedTasks = appData.tasks.filter(t => t.completed).length;
+            const totalTasks = appData.tasks.length;
+            const taskPct = totalTasks ? Math.round((completedTasks / totalTasks) * 100) : 0;
+            
+            document.getElementById('kpiTaskRatio').textContent = `${completedTasks} / ${totalTasks}`;
+            document.getElementById('kpiTaskPercent').textContent = `${taskPct}%`;
+            document.getElementById('kpiTaskProgress').style.width = `${taskPct}%`;
+
+            // Expenses KPI
+            const totalSpent = appData.expenses.reduce((sum, e) => sum + parseFloat(e.amount), 0);
+            document.getElementById('kpiExpenses').textContent = `$${totalSpent.toFixed(2)}`;
+            const budgetPct = Math.min((totalSpent / 1500) * 100, 100);
+            document.getElementById('kpiBudgetProgress').style.width = `${budgetPct}%`;
+
+            // Habits KPI
+            let totalHabitCells = 0;
+            let completedHabitCells = 0;
+            appData.habits.forEach(h => {
+                h.progress.forEach(day => {
+                    totalHabitCells++;
+                    if (day) completedHabitCells++;
+                });
+            });
+            const habitPct = totalHabitCells ? Math.round((completedHabitCells / totalHabitCells) * 100) : 0;
+            document.getElementById('kpiHabitCompletion').textContent = `${habitPct}%`;
+            document.getElementById('kpiHabitProgress').style.width = `${habitPct}%`;
+
+            // Water Display
+            updateWaterDisplay();
+        }
+
+        // --- Initial Application Load ---
+        window.addEventListener('DOMContentLoaded', () => {
+            renderTasks();
+            renderHabits();
+            renderChart();
+            updateKPIs();
+        });
+    </script>
+</body>
+</html>
