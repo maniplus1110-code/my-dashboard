@@ -1,540 +1,154 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Personal Productivity & Life Dashboard</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        brand: {
-                            50: '#f0f9ff',
-                            100: '#e0f2fe',
-                            500: '#0ea5e9',
-                            600: '#0284c7',
-                            700: '#0369a1',
-                        }
-                    }
-                }
-            }
-        }
-    </script>
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        body { font-family: 'Inter', sans-serif; }
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: rgba(156, 163, 175, 0.5); border-radius: 9999px; }
-        .glass-panel {
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(12px);
-        }
-        .dark .glass-panel {
-            background: rgba(30, 41, 59, 0.85);
-            backdrop-filter: blur(12px);
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Personal Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-<body class="bg-slate-100 dark:bg-slate-900 text-slate-800 dark:text-slate-100 min-h-screen transition-colors duration-200">
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100 min-h-screen p-6">
 
-    <header class="sticky top-0 z-50 glass-panel border-b border-slate-200 dark:border-slate-800 px-4 lg:px-8 py-3">
-        <div class="max-w-7xl mx-auto flex items-center justify-between">
-            <div class="flex items-center space-x-3">
-                <div class="p-2 bg-brand-500 rounded-xl text-white shadow-lg shadow-brand-500/30">
-                    <i data-lucide="layout-dashboard" class="w-6 h-6"></i>
-                </div>
-                <div>
-                    <h1 class="font-bold text-lg leading-tight">Life OS</h1>
-                    <p class="text-xs text-slate-500 dark:text-slate-400">Personal Productivity Suite</p>
-                </div>
-            </div>
+  <!-- Header -->
+  <header class="flex justify-between items-center mb-6 max-w-7xl mx-auto">
+    <h1 class="text-2xl font-bold">Personal Analytics & Hub</h1>
+    <button onclick="toggleDarkMode()" class="px-3 py-1 text-sm bg-gray-200 dark:bg-gray-700 rounded-md">
+      🌙 Toggle Dark Mode
+    </button>
+  </header>
 
-            <nav class="hidden md:flex items-center space-x-1 bg-slate-200/60 dark:bg-slate-800/60 p-1 rounded-xl">
-                <button onclick="switchTab('overview')" id="tab-overview" class="nav-tab px-4 py-2 text-sm font-medium rounded-lg transition-all text-slate-700 dark:text-slate-200 hover:bg-white/50 dark:hover:bg-slate-700/50">Overview</button>
-                <button onclick="switchTab('tasks')" id="tab-tasks" class="nav-tab px-4 py-2 text-sm font-medium rounded-lg transition-all text-slate-700 dark:text-slate-200 hover:bg-white/50 dark:hover:bg-slate-700/50">Tasks</button>
-                <button onclick="switchTab('budget')" id="tab-budget" class="nav-tab px-4 py-2 text-sm font-medium rounded-lg transition-all text-slate-700 dark:text-slate-200 hover:bg-white/50 dark:hover:bg-slate-700/50">Budget Calculator</button>
-                <button onclick="switchTab('habits')" id="tab-habits" class="nav-tab px-4 py-2 text-sm font-medium rounded-lg transition-all text-slate-700 dark:text-slate-200 hover:bg-white/50 dark:hover:bg-slate-700/50">Habit Tracker</button>
-            </nav>
+  <!-- Main Dashboard Grid -->
+  <main class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 
-            <div class="flex items-center space-x-3">
-                <button onclick="toggleDarkMode()" class="p-2 rounded-xl bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 transition">
-                    <i data-lucide="sun" class="w-5 h-5 hidden dark:block text-amber-400"></i>
-                    <i data-lucide="moon" class="w-5 h-5 block dark:hidden text-slate-600"></i>
-                </button>
-            </div>
-        </div>
-    </header>
-
-    <div class="md:hidden flex justify-around bg-slate-200 dark:bg-slate-800 p-2 border-b border-slate-300 dark:border-slate-700 text-xs font-medium">
-        <button onclick="switchTab('overview')" class="px-2 py-1">Overview</button>
-        <button onclick="switchTab('tasks')" class="px-2 py-1">Tasks</button>
-        <button onclick="switchTab('budget')" class="px-2 py-1">Budget</button>
-        <button onclick="switchTab('habits')" class="px-2 py-1">Habits</button>
+    <!-- ORIGINAL WIDGET 1: Tasks / To-Do List -->
+    <div class="bg-white dark:bg-gray-800 p-5 rounded-xl shadow">
+      <h2 class="text-lg font-semibold mb-3">✅ Daily Tasks</h2>
+      <div class="flex gap-2 mb-3">
+        <input id="taskInput" type="text" placeholder="Add new task..." class="flex-1 p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 text-sm">
+        <button onclick="addTask()" class="bg-blue-600 text-white px-3 py-1 rounded-md text-sm">Add</button>
+      </div>
+      <ul id="taskList" class="space-y-2 text-sm"></ul>
     </div>
 
-    <main class="max-w-7xl mx-auto p-4 lg:p-8 space-y-8">
+    <!-- NEW WIDGET 1: Habit Tracker Card -->
+    <div class="bg-white dark:bg-gray-800 p-5 rounded-xl shadow">
+      <h2 class="text-lg font-semibold mb-3">🔥 Habit Tracker</h2>
+      <div class="flex gap-2 mb-3">
+        <input id="habitInput" type="text" placeholder="New habit (e.g. Read 20 mins)..." class="flex-1 p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 text-sm">
+        <button onclick="addHabit()" class="bg-green-600 text-white px-3 py-1 rounded-md text-sm">Track</button>
+      </div>
+      <div id="habitContainer" class="space-y-3 text-sm"></div>
+    </div>
 
-        <section id="sec-overview" class="tab-content space-y-6">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-200/80 dark:border-slate-700 flex items-center space-x-4">
-                    <div class="p-3 bg-blue-500/10 text-blue-500 rounded-xl"><i data-lucide="check-circle-2" class="w-6 h-6"></i></div>
-                    <div>
-                        <p class="text-xs text-slate-500 dark:text-slate-400 font-medium">Pending Tasks</p>
-                        <h3 class="text-2xl font-bold" id="dash-pending-tasks">0</h3>
-                    </div>
-                </div>
-                <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-200/80 dark:border-slate-700 flex items-center space-x-4">
-                    <div class="p-3 bg-emerald-500/10 text-emerald-500 rounded-xl"><i data-lucide="wallet" class="w-6 h-6"></i></div>
-                    <div>
-                        <p class="text-xs text-slate-500 dark:text-slate-400 font-medium">Net Savings</p>
-                        <h3 class="text-2xl font-bold" id="dash-net-savings">$0</h3>
-                    </div>
-                </div>
-                <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-200/80 dark:border-slate-700 flex items-center space-x-4">
-                    <div class="p-3 bg-purple-500/10 text-purple-500 rounded-xl"><i data-lucide="flame" class="w-6 h-6"></i></div>
-                    <div>
-                        <p class="text-xs text-slate-500 dark:text-slate-400 font-medium">Active Habits</p>
-                        <h3 class="text-2xl font-bold" id="dash-active-habits">0</h3>
-                    </div>
-                </div>
-                <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-200/80 dark:border-slate-700 flex items-center space-x-4">
-                    <div class="p-3 bg-amber-500/10 text-amber-500 rounded-xl"><i data-lucide="target" class="w-6 h-6"></i></div>
-                    <div>
-                        <p class="text-xs text-slate-500 dark:text-slate-400 font-medium">Goal Progress</p>
-                        <h3 class="text-2xl font-bold" id="dash-goal-progress">0%</h3>
-                    </div>
-                </div>
-            </div>
+    <!-- NEW WIDGET 2: Quick Budget Calculator -->
+    <div class="bg-white dark:bg-gray-800 p-5 rounded-xl shadow">
+      <h2 class="text-lg font-semibold mb-3">💰 Quick Budget Calculator</h2>
+      <div class="grid grid-cols-2 gap-2 mb-3">
+        <input id="budgetIncome" type="number" placeholder="Monthly Income ($)" class="p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 text-sm" oninput="calculateBudget()">
+        <input id="budgetExpenses" type="number" placeholder="Monthly Expenses ($)" class="p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 text-sm" oninput="calculateBudget()">
+      </div>
+      <div class="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg space-y-1 text-sm">
+        <div class="flex justify-between"><span>Net Savings:</span><span id="netSavings" class="font-bold text-green-500">$0</span></div>
+        <div class="flex justify-between"><span>Savings Rate:</span><span id="savingsRate" class="font-bold text-blue-500">0%</span></div>
+      </div>
+    </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-200/80 dark:border-slate-700">
-                    <h3 class="text-base font-semibold mb-4 flex items-center"><i data-lucide="pie-chart" class="w-5 h-5 mr-2 text-brand-500"></i>Monthly Spending Breakdown</h3>
-                    <div class="h-64 flex justify-center items-center">
-                        <canvas id="overviewExpenseChart"></canvas>
-                    </div>
-                </div>
-                <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-200/80 dark:border-slate-700">
-                    <h3 class="text-base font-semibold mb-4 flex items-center"><i data-lucide="calendar" class="w-5 h-5 mr-2 text-purple-500"></i>Habit Weekly Overview</h3>
-                    <div class="h-64 flex justify-center items-center">
-                        <canvas id="overviewHabitChart"></canvas>
-                    </div>
-                </div>
-            </div>
-        </section>
+    <!-- ORIGINAL WIDGET 2: Notes / Quick Capture -->
+    <div class="bg-white dark:bg-gray-800 p-5 rounded-xl shadow md:col-span-2 lg:col-span-3">
+      <h2 class="text-lg font-semibold mb-3">📝 Quick Notes</h2>
+      <textarea id="notesArea" placeholder="Write thoughts or notes here..." class="w-full h-24 p-3 border rounded-md dark:bg-gray-700 dark:border-gray-600 text-sm" oninput="saveNotes()"></textarea>
+    </div>
 
-        <section id="sec-tasks" class="tab-content hidden space-y-6">
-            <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-200/80 dark:border-slate-700">
-                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-                    <h2 class="text-xl font-bold">Task Management</h2>
-                    <form id="task-form" onsubmit="addTask(event)" class="flex gap-2 w-full md:w-auto">
-                        <input type="text" id="task-input" placeholder="Add a new task..." required class="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-900 border-none text-sm focus:ring-2 focus:ring-brand-500 w-full md:w-80">
-                        <button type="submit" class="px-4 py-2 bg-brand-500 hover:bg-brand-600 text-white font-medium text-sm rounded-xl transition flex items-center whitespace-nowrap"><i data-lucide="plus" class="w-4 h-4 mr-1"></i> Add Task</button>
-                    </form>
-                </div>
-                <div id="tasks-container" class="space-y-2"></div>
-            </div>
-        </section>
+  </main>
 
-        <section id="sec-budget" class="tab-content hidden space-y-6">
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <!-- Add Transaction Form & Savings Goal -->
-                <div class="space-y-6">
-                    <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-200/80 dark:border-slate-700">
-                        <h3 class="text-lg font-bold mb-4 flex items-center"><i data-lucide="plus-circle" class="w-5 h-5 mr-2 text-emerald-500"></i>Add Transaction</h3>
-                        <form id="budget-form" onsubmit="addTransaction(event)" class="space-y-4">
-                            <div>
-                                <label class="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">Description</label>
-                                <input type="text" id="trans-desc" placeholder="e.g. Salary, Rent, Groceries" required class="w-full px-3 py-2 rounded-xl bg-slate-100 dark:bg-slate-900 border-none text-sm focus:ring-2 focus:ring-brand-500">
-                            </div>
-                            <div class="grid grid-cols-2 gap-3">
-                                <div>
-                                    <label class="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">Amount ($)</label>
-                                    <input type="number" id="trans-amount" step="0.01" min="0.01" placeholder="0.00" required class="w-full px-3 py-2 rounded-xl bg-slate-100 dark:bg-slate-900 border-none text-sm focus:ring-2 focus:ring-brand-500">
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">Type</label>
-                                    <select id="trans-type" class="w-full px-3 py-2 rounded-xl bg-slate-100 dark:bg-slate-900 border-none text-sm focus:ring-2 focus:ring-brand-500">
-                                        <option value="income">Income</option>
-                                        <option value="expense">Expense</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div>
-                                <label class="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">Category</label>
-                                <select id="trans-category" class="w-full px-3 py-2 rounded-xl bg-slate-100 dark:bg-slate-900 border-none text-sm focus:ring-2 focus:ring-brand-500">
-                                    <option value="General">General</option>
-                                    <option value="Housing">Housing</option>
-                                    <option value="Food">Food</option>
-                                    <option value="Entertainment">Entertainment</option>
-                                    <option value="Utilities">Utilities</option>
-                                    <option value="Salary">Salary</option>
-                                </select>
-                            </div>
-                            <button type="submit" class="w-full py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white font-medium text-sm rounded-xl transition flex justify-center items-center"><i data-lucide="check" class="w-4 h-4 mr-1"></i> Record Entry</button>
-                        </form>
-                    </div>
+  <!-- Dashboard JavaScript Logic with LocalStorage -->
+  <script>
+    // Dark Mode Toggle
+    function toggleDarkMode() {
+      document.documentElement.classList.toggle('dark');
+    }
 
-                    <!-- Savings Goal Widget -->
-                    <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-200/80 dark:border-slate-700">
-                        <h3 class="text-lg font-bold mb-3 flex items-center"><i data-lucide="target" class="w-5 h-5 mr-2 text-brand-500"></i>Monthly Savings Goal</h3>
-                        <div class="space-y-3">
-                            <div class="flex justify-between items-center text-sm">
-                                <span class="text-slate-500">Goal Target:</span>
-                                <input type="number" id="savings-goal-input" onchange="updateGoalTarget(this.value)" class="w-28 text-right px-2 py-1 rounded-lg bg-slate-100 dark:bg-slate-900 border-none text-sm font-semibold" value="1000">
-                            </div>
-                            <div class="w-full bg-slate-200 dark:bg-slate-700 h-3 rounded-full overflow-hidden">
-                                <div id="goal-progress-bar" class="bg-brand-500 h-full w-0 transition-all duration-300"></div>
-                            </div>
-                            <p id="goal-status-text" class="text-xs text-slate-500 text-right">0% Achieved</p>
-                        </div>
-                    </div>
-                </div>
+    // Tasks Management
+    let tasks = JSON.parse(localStorage.getItem('my_tasks')) || [];
+    function renderTasks() {
+      const list = document.getElementById('taskList');
+      list.innerHTML = tasks.map((t, i) => `
+        <li class="flex justify-between items-center bg-gray-50 dark:bg-gray-700 p-2 rounded">
+          <span class="${t.done ? 'line-through text-gray-400' : ''}" onclick="toggleTask(${i})">${t.text}</span>
+          <button onclick="removeTask(${i})" class="text-red-500 text-xs">✕</button>
+        </li>
+      `).join('');
+      localStorage.setItem('my_tasks', JSON.stringify(tasks));
+    }
+    function addTask() {
+      const input = document.getElementById('taskInput');
+      if (input.value.trim()) {
+        tasks.push({ text: input.value.trim(), done: false });
+        input.value = '';
+        renderTasks();
+      }
+    }
+    function toggleTask(i) { tasks[i].done = !tasks[i].done; renderTasks(); }
+    function removeTask(i) { tasks.splice(i, 1); renderTasks(); }
 
-                <!-- Transaction Log Table & Financial Summary -->
-                <div class="lg:col-span-2 space-y-6">
-                    <div class="grid grid-cols-3 gap-4">
-                        <div class="bg-emerald-500/10 border border-emerald-500/20 p-4 rounded-2xl">
-                            <p class="text-xs text-emerald-600 dark:text-emerald-400 font-medium">Total Income</p>
-                            <h4 id="calc-income" class="text-xl font-bold text-emerald-600 dark:text-emerald-400">$0.00</h4>
-                        </div>
-                        <div class="bg-rose-500/10 border border-rose-500/20 p-4 rounded-2xl">
-                            <p class="text-xs text-rose-600 dark:text-rose-400 font-medium">Total Expenses</p>
-                            <h4 id="calc-expense" class="text-xl font-bold text-rose-600 dark:text-rose-400">$0.00</h4>
-                        </div>
-                        <div class="bg-brand-500/10 border border-brand-500/20 p-4 rounded-2xl">
-                            <p class="text-xs text-brand-600 dark:text-brand-400 font-medium">Net Savings</p>
-                            <h4 id="calc-savings" class="text-xl font-bold text-brand-600 dark:text-brand-400">$0.00</h4>
-                        </div>
-                    </div>
+    // Habit Tracker Management
+    let habits = JSON.parse(localStorage.getItem('my_habits')) || [];
+    function renderHabits() {
+      const container = document.getElementById('habitContainer');
+      container.innerHTML = habits.map((h, i) => `
+        <div class="flex justify-between items-center bg-gray-50 dark:bg-gray-700 p-2 rounded">
+          <span>${h.name}</span>
+          <div class="flex items-center gap-2">
+            <button onclick="checkHabit(${i})" class="bg-emerald-500 text-white text-xs px-2 py-1 rounded">Streak: ${h.streak || 0} 🔥</button>
+            <button onclick="removeHabit(${i})" class="text-red-500 text-xs">✕</button>
+          </div>
+        </div>
+      `).join('');
+      localStorage.setItem('my_habits', JSON.stringify(habits));
+    }
+    function addHabit() {
+      const input = document.getElementById('habitInput');
+      if (input.value.trim()) {
+        habits.push({ name: input.value.trim(), streak: 0 });
+        input.value = '';
+        renderHabits();
+      }
+    }
+    function checkHabit(i) { habits[i].streak = (habits[i].streak || 0) + 1; renderHabits(); }
+    function removeHabit(i) { habits.splice(i, 1); renderHabits(); }
 
-                    <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-200/80 dark:border-slate-700">
-                        <h3 class="text-lg font-bold mb-4">Transaction History</h3>
-                        <div class="overflow-x-auto max-h-80 overflow-y-auto">
-                            <table class="w-full text-left text-sm">
-                                <thead>
-                                    <tr class="border-b border-slate-200 dark:border-slate-700 text-xs text-slate-400 uppercase">
-                                        <th class="py-2">Description</th>
-                                        <th class="py-2">Category</th>
-                                        <th class="py-2">Amount</th>
-                                        <th class="py-2 text-right">Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="budget-list" class="divide-y divide-slate-100 dark:divide-slate-800"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
+    // Budget Calculator Logic
+    function calculateBudget() {
+      const income = parseFloat(document.getElementById('budgetIncome').value) || 0;
+      const expenses = parseFloat(document.getElementById('budgetExpenses').value) || 0;
+      const savings = income - expenses;
+      const rate = income > 0 ? ((savings / income) * 100).toFixed(1) : 0;
 
-        <section id="sec-habits" class="tab-content hidden space-y-6">
-            <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-200/80 dark:border-slate-700">
-                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-                    <div>
-                        <h2 class="text-xl font-bold">Habit Tracker</h2>
-                        <p class="text-xs text-slate-500">Track your daily routines and build streaks.</p>
-                    </div>
-                    <form id="habit-form" onsubmit="addHabit(event)" class="flex gap-2 w-full md:w-auto">
-                        <input type="text" id="habit-input" placeholder="New habit (e.g. Read 20 mins)..." required class="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-900 border-none text-sm focus:ring-2 focus:ring-brand-500 w-full md:w-80">
-                        <button type="submit" class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white font-medium text-sm rounded-xl transition flex items-center whitespace-nowrap"><i data-lucide="plus" class="w-4 h-4 mr-1"></i> Add Habit</button>
-                    </form>
-                </div>
+      document.getElementById('netSavings').innerText = `$${savings}`;
+      document.getElementById('savingsRate').innerText = `${rate}%`;
 
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left">
-                        <thead>
-                            <tr class="border-b border-slate-200 dark:border-slate-700 text-xs text-slate-400">
-                                <th class="py-3 px-2">Habit</th>
-                                <th class="py-3 px-2 text-center">Streak</th>
-                                <th class="py-3 px-2 text-center">Mon</th>
-                                <th class="py-3 px-2 text-center">Tue</th>
-                                <th class="py-3 px-2 text-center">Wed</th>
-                                <th class="py-3 px-2 text-center">Thu</th>
-                                <th class="py-3 px-2 text-center">Fri</th>
-                                <th class="py-3 px-2 text-center">Sat</th>
-                                <th class="py-3 px-2 text-center">Sun</th>
-                                <th class="py-3 px-2 text-right">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody id="habits-container" class="divide-y divide-slate-100 dark:divide-slate-800"></tbody>
-                    </table>
-                </div>
-            </div>
-        </section>
+      localStorage.setItem('my_budget', JSON.stringify({ income, expenses }));
+    }
 
-    </main>
+    // Notes Persistence
+    function saveNotes() {
+      localStorage.setItem('my_notes', document.getElementById('notesArea').value);
+    }
 
-    <script>
-        // State Initialization
-        let tasks = JSON.parse(localStorage.getItem('lifeos_tasks')) || [
-            { id: 1, title: "Organize weekly schedule", completed: false },
-            { id: 2, title: "Review monthly savings target", completed: true }
-        ];
+    // Initialize saved data on page load
+    window.onload = () => {
+      renderTasks();
+      renderHabits();
+      const savedNotes = localStorage.getItem('my_notes');
+      if (savedNotes) document.getElementById('notesArea').value = savedNotes;
 
-        let transactions = JSON.parse(localStorage.getItem('lifeos_transactions')) || [
-            { id: 1, desc: "Monthly Salary", amount: 3500, type: "income", category: "Salary" },
-            { id: 2, desc: "Apartment Rent", amount: 1200, type: "expense", category: "Housing" },
-            { id: 3, desc: "Groceries", amount: 250, type: "expense", category: "Food" }
-        ];
-
-        let habits = JSON.parse(localStorage.getItem('lifeos_habits')) || [
-            { id: 1, name: "Morning Workout", streak: 4, history: [true, true, true, true, false, false, false] },
-            { id: 2, name: "Read 20 pages", streak: 2, history: [false, true, true, false, false, false, false] }
-        ];
-
-        let savingsGoal = parseFloat(localStorage.getItem('lifeos_savings_goal')) || 1000;
-
-        let expenseChart = null;
-        let habitChart = null;
-
-        // On Page Load
-        window.onload = function() {
-            lucide.createIcons();
-            document.getElementById('savings-goal-input').value = savingsGoal;
-            renderAll();
-        };
-
-        // Navigation
-        function switchTab(tabId) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-            document.getElementById(`sec-${tabId}`).classList.remove('hidden');
-
-            document.querySelectorAll('.nav-tab').forEach(el => el.classList.remove('bg-white', 'dark:bg-slate-700', 'shadow-sm'));
-            document.getElementById(`tab-${tabId}`).classList.add('bg-white', 'dark:bg-slate-700', 'shadow-sm');
-
-            if (tabId === 'overview') renderCharts();
-        }
-
-        function toggleDarkMode() {
-            document.documentElement.classList.toggle('dark');
-        }
-
-        // Render Functions
-        function renderAll() {
-            renderTasks();
-            renderBudget();
-            renderHabits();
-            renderOverviewStats();
-            renderCharts();
-        }
-
-        // --- TASKS MODULE ---
-        function renderTasks() {
-            const container = document.getElementById('tasks-container');
-            container.innerHTML = tasks.length === 0 ? '<p class="text-sm text-slate-400 py-4 text-center">No tasks found.</p>' : '';
-            tasks.forEach(task => {
-                container.innerHTML += `
-                    <div class="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-slate-900/50 hover:bg-slate-100 dark:hover:bg-slate-900 transition">
-                        <div class="flex items-center space-x-3">
-                            <input type="checkbox" ${task.completed ? 'checked' : ''} onchange="toggleTask(${task.id})" class="w-4 h-4 text-brand-500 rounded border-slate-300">
-                            <span class="text-sm ${task.completed ? 'line-through text-slate-400' : ''}">${task.title}</span>
-                        </div>
-                        <button onclick="deleteTask(${task.id})" class="text-slate-400 hover:text-rose-500 p-1"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
-                    </div>
-                `;
-            });
-            lucide.createIcons();
-            document.getElementById('dash-pending-tasks').innerText = tasks.filter(t => !t.completed).length;
-        }
-
-        function addTask(e) {
-            e.preventDefault();
-            const input = document.getElementById('task-input');
-            tasks.push({ id: Date.now(), title: input.value, completed: false });
-            input.value = '';
-            saveAndRender();
-        }
-
-        function toggleTask(id) {
-            tasks = tasks.map(t => t.id === id ? { ...t, completed: !t.completed } : t);
-            saveAndRender();
-        }
-
-        function deleteTask(id) {
-            tasks = tasks.filter(t => t.id !== id);
-            saveAndRender();
-        }
-
-        // --- BUDGET CALCULATOR MODULE ---
-        function renderBudget() {
-            const list = document.getElementById('budget-list');
-            list.innerHTML = '';
-            
-            let totalIncome = 0;
-            let totalExpense = 0;
-            
-            transactions.forEach(t => {
-                if (t.type === 'income') totalIncome += t.amount;
-                else totalExpense += t.amount;
-
-                list.innerHTML += `
-                    <tr class="border-b border-slate-100 dark:border-slate-800/50 text-sm">
-                        <td class="py-3 font-medium">${t.desc}</td>
-                        <td class="py-3"><span class="px-2 py-0.5 rounded-full text-xs ${t.type === 'income' ? 'bg-emerald-500/10 text-emerald-500' : 'bg-rose-500/10 text-rose-500'}">${t.category}</span></td>
-                        <td class="py-3 font-semibold ${t.type === 'income' ? 'text-emerald-500' : 'text-rose-500'}">${t.type === 'income' ? '+' : '-'}$${t.amount.toFixed(2)}</td>
-                        <td class="py-3 text-right"><button onclick="deleteTransaction(${t.id})" class="text-slate-400 hover:text-rose-500"><i data-lucide="trash-2" class="w-4 h-4"></i></button></td>
-                    </tr>
-                `;
-            });
-
-            const netSavings = totalIncome - totalExpense;
-            document.getElementById('calc-income').innerText = `$${totalIncome.toFixed(2)}`;
-            document.getElementById('calc-expense').innerText = `$${totalExpense.toFixed(2)}`;
-            document.getElementById('calc-savings').innerText = `$${netSavings.toFixed(2)}`;
-            document.getElementById('dash-net-savings').innerText = `$${netSavings.toFixed(2)}`;
-
-            // Update Progress Bar
-            const progress = Math.min(Math.max((netSavings / savingsGoal) * 100, 0), 100);
-            document.getElementById('goal-progress-bar').style.width = `${progress}%`;
-            document.getElementById('goal-status-text').innerText = `${progress.toFixed(0)}% Achieved`;
-            document.getElementById('dash-goal-progress').innerText = `${progress.toFixed(0)}%`;
-
-            lucide.createIcons();
-        }
-
-        function addTransaction(e) {
-            e.preventDefault();
-            const desc = document.getElementById('trans-desc').value;
-            const amount = parseFloat(document.getElementById('trans-amount').value);
-            const type = document.getElementById('trans-type').value;
-            const category = document.getElementById('trans-category').value;
-
-            transactions.push({ id: Date.now(), desc, amount, type, category });
-            document.getElementById('budget-form').reset();
-            saveAndRender();
-        }
-
-        function deleteTransaction(id) {
-            transactions = transactions.filter(t => t.id !== id);
-            saveAndRender();
-        }
-
-        function updateGoalTarget(val) {
-            savingsGoal = parseFloat(val) || 1000;
-            localStorage.setItem('lifeos_savings_goal', savingsGoal);
-            renderBudget();
-        }
-
-        // --- HABIT TRACKER MODULE ---
-        function renderHabits() {
-            const container = document.getElementById('habits-container');
-            container.innerHTML = '';
-
-            habits.forEach(h => {
-                let historyHTML = h.history.map((checked, dayIdx) => `
-                    <td class="py-3 px-2 text-center">
-                        <input type="checkbox" ${checked ? 'checked' : ''} onchange="toggleHabitDay(${h.id}, ${dayIdx})" class="w-4 h-4 text-purple-600 rounded border-slate-300">
-                    </td>
-                `).join('');
-
-                container.innerHTML += `
-                    <tr class="text-sm">
-                        <td class="py-3 px-2 font-medium">${h.name}</td>
-                        <td class="py-3 px-2 text-center"><span class="px-2 py-1 rounded-lg bg-purple-500/10 text-purple-600 font-bold text-xs"><i data-lucide="flame" class="w-3 h-3 inline mr-0.5"></i>${h.streak}d</span></td>
-                        ${historyHTML}
-                        <td class="py-3 px-2 text-right"><button onclick="deleteHabit(${h.id})" class="text-slate-400 hover:text-rose-500"><i data-lucide="trash-2" class="w-4 h-4"></i></button></td>
-                    </tr>
-                `;
-            });
-
-            document.getElementById('dash-active-habits').innerText = habits.length;
-            lucide.createIcons();
-        }
-
-        function addHabit(e) {
-            e.preventDefault();
-            const input = document.getElementById('habit-input');
-            habits.push({ id: Date.now(), name: input.value, streak: 0, history: [false, false, false, false, false, false, false] });
-            input.value = '';
-            saveAndRender();
-        }
-
-        function toggleHabitDay(habitId, dayIdx) {
-            habits = habits.map(h => {
-                if (h.id === habitId) {
-                    const newHistory = [...h.history];
-                    newHistory[dayIdx] = !newHistory[dayIdx];
-                    const streak = newHistory.filter(Boolean).length;
-                    return { ...h, history: newHistory, streak };
-                }
-                return h;
-            });
-            saveAndRender();
-        }
-
-        function deleteHabit(id) {
-            habits = habits.filter(h => h.id !== id);
-            saveAndRender();
-        }
-
-        // Overview Stats & Charts
-        function renderOverviewStats() {
-            document.getElementById('dash-pending-tasks').innerText = tasks.filter(t => !t.completed).length;
-        }
-
-        function renderCharts() {
-            // Expenses Pie Chart
-            const ctxExpense = document.getElementById('overviewExpenseChart')?.getContext('2d');
-            if (!ctxExpense) return;
-
-            const categories = {};
-            transactions.filter(t => t.type === 'expense').forEach(t => {
-                categories[t.category] = (categories[t.category] || 0) + t.amount;
-            });
-
-            if (expenseChart) expenseChart.destroy();
-            expenseChart = new Chart(ctxExpense, {
-                type: 'doughnut',
-                data: {
-                    labels: Object.keys(categories).length ? Object.keys(categories) : ['No Expenses'],
-                    datasets: [{
-                        data: Object.values(categories).length ? Object.values(categories) : [1],
-                        backgroundColor: ['#0ea5e9', '#f43f5e', '#8b5cf6', '#10b981', '#f59e0b']
-                    }]
-                },
-                options: { responsive: true, maintainAspectRatio: false }
-            });
-
-            // Habits Weekly Progress Bar Chart
-            const ctxHabit = document.getElementById('overviewHabitChart')?.getContext('2d');
-            if (!ctxHabit) return;
-
-            const dayCounts = [0, 0, 0, 0, 0, 0, 0];
-            habits.forEach(h => {
-                h.history.forEach((completed, idx) => {
-                    if (completed) dayCounts[idx]++;
-                });
-            });
-
-            if (habitChart) habitChart.destroy();
-            habitChart = new Chart(ctxHabit, {
-                type: 'bar',
-                data: {
-                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-                    datasets: [{
-                        label: 'Completed Habits',
-                        data: dayCounts,
-                        backgroundColor: '#8b5cf6',
-                        borderRadius: 6
-                    }]
-                },
-                options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } }
-            });
-        }
-
-        // Utility: Save All States
-        function saveAndRender() {
-            localStorage.setItem('lifeos_tasks', JSON.stringify(tasks));
-            localStorage.setItem('lifeos_transactions', JSON.stringify(transactions));
-            localStorage.setItem('lifeos_habits', JSON.stringify(habits));
-            renderAll();
-        }
-    </script>
+      const savedBudget = JSON.parse(localStorage.getItem('my_budget'));
+      if (savedBudget) {
+        document.getElementById('budgetIncome').value = savedBudget.income || '';
+        document.getElementById('budgetExpenses').value = savedBudget.expenses || '';
+        calculateBudget();
+      }
+    };
+  </script>
 </body>
 </html>
